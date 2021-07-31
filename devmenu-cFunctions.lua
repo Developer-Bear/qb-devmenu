@@ -58,11 +58,12 @@ function ToggleVehicleDeveloperMode()
                 local netID = VehToNet(vehicle)
                 local hash = GetEntityModel(vehicle)
                 local modelName = GetLabelText(GetDisplayNameFromVehicleModel(hash))
+                local makeName = GetLabelText(GetMakeNameFromVehicleModel(hash))
                 local eHealth = GetVehicleEngineHealth(vehicle)
                 local bHealth = GetVehicleBodyHealth(vehicle)
                 Draw2DText('Vehicle Developer Data:', 4, {66, 182, 245}, 0.4, x + 0.0, y + 0.0)
                 Draw2DText(string.format('Entity ID: ~b~%s~s~ | Net ID: ~b~%s~s~', vehicle, netID), 4, {255, 255, 255}, 0.4, x + 0.0, y + 0.025)
-                Draw2DText(string.format('Model: ~b~%s~s~ | Hash: ~b~%s~s~', modelName, hash), 4, {255, 255, 255}, 0.4, x + 0.0, y + 0.050)
+                Draw2DText(string.format('Make: ~b~%s~s~ | Model: ~b~%s~s~ | Hash: ~b~%s~s~', makeName, modelName, hash), 4, {255, 255, 255}, 0.4, x + 0.0, y + 0.050)
                 Draw2DText(string.format('Engine Health: ~b~%s~s~ | Body Health: ~b~%s~s~', math.round(eHealth, 2), math.round(bHealth, 2)), 4, {255, 255, 255}, 0.4, x + 0.0, y + 0.075)
             end
         end
