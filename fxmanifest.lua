@@ -9,17 +9,18 @@ version '1.0.0'
 ui_page 'html/index.html'
 
 shared_scripts {
-    '@qb-core/import.lua',
-    'devmenu-config.lua'
+    '@qb-core/import.lua'
 }
 
 client_scripts {
     '@menuv/menuv.lua',
+    'devmenu-config.lua',
     'devmenu-cMenu.lua',
     'devmenu-cFunctions.lua'
 }
 
 server_scripts {
+    'devmenu-config.lua',
     'devmenu-server.lua'
 }
 

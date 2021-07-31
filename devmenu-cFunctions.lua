@@ -1,3 +1,6 @@
+local isControllingCamera = false
+local camera
+
 function CopyToClipboard(dataType)
     local ped = PlayerPedId()
     if dataType == 'coords' then
@@ -16,6 +19,25 @@ function CopyToClipboard(dataType)
             string = h
         })
         QBCore.Functions.Notify("Heading copied to clipboard!", "success")
+    elseif dataType == 'camCoords' then
+        local coords = GetCamCoord(camera)
+        local x = math.round(coords.x, 2)
+        local y = math.round(coords.y, 2)
+        local z = math.round(coords.z, 2)
+        SendNUIMessage({
+            string = string.format('vector3(%s, %s, %s)', x, y, z)
+        })
+        QBCore.Functions.Notify("Camera coordinates copied to clipboard!", "success")
+    elseif dataType == 'camRot' then
+        local rot = GetCamRot(camera, 2)
+        print(rot)
+        local x = math.round(rot.x, 2)
+        local y = math.round(rot.y, 2)
+        local z = math.round(rot.z, 2)
+        SendNUIMessage({
+            string = string.format('vector3(%s, %s, %s)', x, y, z)
+        })
+        QBCore.Functions.Notify("Camera rotation copied to clipboard!", "success")
     end
 end
 
@@ -46,6 +68,75 @@ function ToggleVehicleDeveloperMode()
         end
     end)
 end
+
+--------------------------------------------------------------------------------------------
+-- CAMERAS 
+--------------------------------------------------------------------------------------------
+function CreateCamera()
+    if not camera then
+        camera = CreateCam("DEFAULT_SCRIPTED_CAMERA", 1)
+        SetCamCoord(camera, GetEntityCoords(PlayerPedId()))
+        SetCamRot(camera, 0.0, 2)
+        SetCamFov(camera, 40.0)
+        SetCamActive(camera, true)
+        RenderScriptCams(true, false, 1, true, true)
+        isControllingCamera = true
+        FreezeEntityPosition(PlayerPedId(), true)
+        while isControllingCamera do
+            local cameraCoords = GetCamCoord(camera)
+            local cameraRotation = GetCamRot(camera, 2)
+            Citizen.Wait(0)
+            if IsControlPressed(0, Config.CameraDev.Controls.Up) then
+                SetCamCoord(camera, cameraCoords.x, cameraCoords.y, cameraCoords.z + Config.CameraDev.MovementSensitivity)
+            end
+            if IsControlPressed(0, Config.CameraDev.Controls.Down) then
+                SetCamCoord(camera, cameraCoords.x, cameraCoords.y, cameraCoords.z - Config.CameraDev.MovementSensitivity)
+            end
+            if IsControlPressed(0, Config.CameraDev.Controls.Forward) then
+                SetCamCoord(camera, cameraCoords.x, cameraCoords.y + Config.CameraDev.MovementSensitivity, cameraCoords.z)
+            end
+            if IsControlPressed(0, Config.CameraDev.Controls.Backward) then
+                SetCamCoord(camera, cameraCoords.x, cameraCoords.y - Config.CameraDev.MovementSensitivity, cameraCoords.z)
+            end
+            if IsControlPressed(0, Config.CameraDev.Controls.Left) then
+                SetCamCoord(camera, cameraCoords.x - Config.CameraDev.MovementSensitivity, cameraCoords.y, cameraCoords.z)
+            end
+            if IsControlPressed(0, Config.CameraDev.Controls.Right) then
+                SetCamCoord(camera, cameraCoords.x + Config.CameraDev.MovementSensitivity, cameraCoords.y, cameraCoords.z)
+            end
+            if IsControlPressed(0, Config.CameraDev.Controls.TiltForward) and IsControlPressed(0, 21) then
+                SetCamRot(camera, cameraRotation.x + Config.CameraDev.MovementSensitivity, cameraRotation.y, cameraRotation.z, 2)
+            end
+            if IsControlPressed(0, Config.CameraDev.Controls.TiltBackward) and IsControlPressed(0, 21) then
+                SetCamRot(camera, cameraRotation.x - Config.CameraDev.MovementSensitivity, cameraRotation.y, cameraRotation.z, 2)
+            end
+            if IsControlPressed(0, Config.CameraDev.Controls.RotateLeft) and IsControlPressed(0, 21) then
+                SetCamRot(camera, cameraRotation.x, cameraRotation.y, cameraRotation.z + (Config.CameraDev.MovementSensitivity * 4), 2)
+            end
+            if IsControlPressed(0, Config.CameraDev.Controls.RotateRight) and IsControlPressed(0, 21) then
+                SetCamRot(camera, cameraRotation.x, cameraRotation.y, cameraRotation.z - (Config.CameraDev.MovementSensitivity * 4), 2)
+            end
+        end
+    else
+        QBCore.Functions.Notify("There is already an active camera, destroy it to create a new one", "error")
+    end
+end
+
+function UpdateFov(value)
+    SetCamFov(camera, value + 0.0)
+end
+
+function DestroyCamera()
+    if camera then
+        DestroyCam(camera)
+        camera = nil
+        RenderScriptCams(false, false, 1, true, true)
+        FreezeEntityPosition(PlayerPedId(), false)
+    else
+        QBCore.Functions.Notify("No active camera detected", "error")
+    end
+end
+
 
 --------------------------------------------------------------------------------------------
 -- UTILITY 
