@@ -42,7 +42,8 @@ local cameraDev_button = devMainMenu:AddButton({ icon = '🎦', label = 'Camera 
             DestroyCamera()
         end)
 
-RegisterNetEvent('crp-devmenu:OpenMenu')
-AddEventHandler('crp-devmenu:OpenMenu', function()
+
+RegisterNetEvent('qb-devmenu:OpenMenu')
+AddEventHandler('qb-devmenu:OpenMenu', function()
     MenuV:OpenMenu(devMainMenu)
 end)
